@@ -2,22 +2,32 @@
 This is a Dockerfile allowing you to run the No One Survived Dedicated 
 Server inside of a Docker container, through Wine.
 
-Docker Compose:
-```
+!!
+For now, its not working fine
+!!
+
 version: "3.2"
 
 services:
   nos:
-    image: ladyviktoria/noonesurviveddedicated:latest
+    image: nos:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: nos
     restart: "unless-stopped"
     volumes:
-      - /srv/nos-dedicated:/home/steam/nos-dedicated
+      - ./cmd:/home/steam/steamcmd
+      - ./data:/home/steam/nos-dedicated
+      - ./startup.sh:/root/startup.sh
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=911
+      - PGID=911
+      - STEAMAPPID=2329680
+      - STEAMAPPDIR=/home/steam/nos-dedicated
+      - STEAMCMDDIR=/home/steam/steamcmd
+      - NOS_ARGS=-USEALLAVAILABLECORES -high -preload -log -server
     ports:
       - 7767:7767/udp
       - 7768:7768/udp
       - 27014:27014/udp
-```
