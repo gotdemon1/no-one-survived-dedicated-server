@@ -2,14 +2,12 @@
 # Dockerfile that builds a Conan Exiles Gameserver
 ###########################################################
 FROM debian:bullseye-slim
-
-LABEL maintainer="bert@lair.be"
-
 ################
 # steamcmd     #
 ################
 ENV STEAMCMDDIR /home/steam/steamcmd
-
+ENV STEAMAPPID 2329680
+ENV STEAMAPPDIR /home/steam/nos-dedicated
 # Install, update & upgrade packages
 # Create user for the server
 # This also creates the home directory we later need
@@ -36,8 +34,7 @@ So		 && wget -qO- 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_lin
 ###################
 # No One Survived #
 ###################
-ENV STEAMAPPID 2329680
-ENV STEAMAPPDIR /home/steam/nos-dedicated
+
 RUN sed -i -e "s/ main[[:space:]]*\$/ main contrib non-free/" /etc/apt/sources.list
 # Install dependencies
 RUN set -x \
@@ -61,7 +58,7 @@ ENV LC_ALL en_US.UTF-8
 RUN set -x \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \
-               winbind \
+                winbind \
                libwine \
                libwine:i386 \
                fonts-wine \
@@ -74,19 +71,10 @@ RUN set -x \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
                
-# Run Steamcmd and install the No One Survived Dedicated Server              
-RUN set -x \
-    && su steam -c \
-          "${STEAMCMDDIR}/steamcmd.sh \
-          +@sSteamCmdForcePlatformType windows \
-          +force_install_dir ${STEAMAPPDIR} \
-          +login anonymous \
-          +app_update ${STEAMAPPID} validate \
-          +quit"
+         
 
 WORKDIR $STEAMAPPDIR
 
-VOLUME $STEAMAPPDIR
 
 # Parameters for the Conan process
 RUN	    wget -q -O /usr/sbin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
@@ -94,7 +82,8 @@ RUN	    wget -q -O /usr/sbin/winetricks https://raw.githubusercontent.com/Winetr
 ENV 	NOS_ARGS -log -nosteam -server
 ENV     HOME=${STEAMAPPDIR}
 ENV     WINEPREFIX=${STEAMAPPDIR}/.wine
-ENV     WINEDLLOVERRIDES="mscoree,mshtml="
+ENV     WINEARCH="win32"
+#ENV     WINEDLLOVERRIDES="mscoree,mshtml="
 ENV     DISPLAY=:0
 ENV     DISPLAY_WIDTH=1024
 ENV     DISPLAY_HEIGHT=768
@@ -108,4 +97,4 @@ ENV     XVFB=1
 COPY ./startup.sh /root/startup.sh
 ENTRYPOINT ["/root/startup.sh"]
 
-EXPOSE 27014/udp 7767/udp 
+EXPOSE 27014/udp 7777/udp 
