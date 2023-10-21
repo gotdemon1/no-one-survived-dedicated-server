@@ -1,11 +1,12 @@
 # What?
 This is a Dockerfile allowing you to run the No One Survived Dedicated 
 Server inside of a Docker container, through Wine.
-
+<p >
 !!
-For now, its not working fine
+<b style="color: red;">For now, its not working fine</b>
 !!
-
+</p>
+<pre>
 version: "3.2"
 
 services:
@@ -31,3 +32,4 @@ services:
       - 7767:7767/udp
       - 7768:7768/udp
       - 27014:27014/udp
+      </pre>
