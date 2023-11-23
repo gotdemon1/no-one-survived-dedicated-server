@@ -2,21 +2,25 @@ version: "3.2"
 
 services:
   nos:
-    image: nos:latest
+    image: nos
     build:
       context: .
       dockerfile: Dockerfile
     container_name: nos
-    restart: "unless-stopped"
+#    restart: "unless-stopped"
     volumes:
-      - ./cmd:/home/steam/steamcmd
-      - ./data:/home/steam/nos-dedicated
-      - ./startup.sh:/root/startup.sh
+      - ./gamedata/:/home/steam/nos/
+      - ./Game.ini:/home/steam/Game.ini 
+      - ./backup/:/home/steam/backup/:rw
+      - ./start.sh:/etc/entrypoint.sh
+      - ./backup.sh:/home/steam/backup.sh
+      - ./crontab.txt:/home/steam/crontab.txt
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - PUID=911
       - PGID=911
       - STEAMAPPID=2329680
-      - STEAMAPPDIR=/home/steam/nos-dedicated
+      - STEAMAPPDIR=/home/steam/nos
       - STEAMCMDDIR=/home/steam/steamcmd
       - NOS_ARGS=-USEALLAVAILABLECORES -high -preload -log -server
     ports:
